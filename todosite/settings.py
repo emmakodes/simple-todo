@@ -9,23 +9,35 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-5v=6jq7qv7-ah_d043g2-%-(-^okzgm8cnwlz26t$7e^x(pwfb'
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = []
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "dev-only-unsafe-secret-key"
+    else:
+        raise RuntimeError("DJANGO_SECRET_KEY is required when DEBUG=False")
+
+ALLOWED_HOSTS = (
+    os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",")
+    if os.environ.get("DJANGO_ALLOWED_HOSTS")
+    else []
+)
 
 
 # Application definition
