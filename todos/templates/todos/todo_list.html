@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Todos</title>
+    <style>
+        body { font-family: -apple-system, system-ui, sans-serif; margin: 2rem; }
+        .container { max-width: 560px; margin: 0 auto; }
+        form { display: flex; gap: 8px; margin-bottom: 16px; }
+        input[type="text"] { flex: 1; padding: 10px; font-size: 16px; }
+        button { padding: 10px 14px; font-size: 14px; cursor: pointer; }
+        ul { list-style: none; padding: 0; margin: 0; }
+        li { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .completed { text-decoration: line-through; color: #888; }
+        .actions { display: flex; gap: 8px; }
+        a { text-decoration: none; }
+    </style>
+    
+</head>
+<body>
+<div class="container">
+    <h1>Todos</h1>
+
+    <form action="{% url 'todos:add' %}" method="post">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="Add a new task..." required />
+        <button type="submit">Add</button>
+    </form>
+
+    <ul>
+        {% for todo in todos %}
+            <li>
+                <span class="{% if todo.is_completed %}completed{% endif %}">{{ todo.title }}</span>
+                <span class="actions">
+                    <a href="{% url 'todos:toggle' todo.id %}">{{ todo.is_completed|yesno:"Undo,Done" }}</a>
+                    <a href="{% url 'todos:delete' todo.id %}" onclick="return confirm('Delete this task?')">Delete</a>
+                </span>
+            </li>
+        {% empty %}
+            <li>No tasks yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+</body>
+</html>
+
+
